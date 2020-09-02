@@ -1,0 +1,25 @@
+# WikiRace Server
+Facilitates WebSocket messages and manages state for WikiRace.
+
+## WebSocket events
+| Event name     | Origin | Description                                                                                                             | Data properties                                                   |
+|----------------|--------|-------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|
+| c_join         | Client | Sent when joining the game.                                                                                             | `name: string`                                                    |
+| s_init         | Server | Sent in response to `c_join` to identify the current game and client ID. Used to detect reconnects.                     | `clientID: number`, `sessionID: string`                           |
+| c_reconnect    | Client | Sent if a client suspects they are rejoining the game after a page refresh.                                             | `clientID: number`, `sessionID: string`                           |
+| c_startMatch   | Client | Signals that all players have joined and the match should start (need only be sent by a single client, like Jackbox).   | None                                                              |
+| s_players      | Server | Provides a list of all players                                                                                          | `players: [{ id: number, name: string }]`                         |
+| s_roundInfo    | Server | Provides info on the current round that is relevant before the round begins. A path will be null if not yet set.        | `startPath: string`, `destPath: string`                           |
+| c_setSource    | Client | Sets source article (starting point).                                                                                   | `path: string`                                                    |
+| c_setDest      | Client | Sets destination article.                                                                                               | `path: string`                                                    |
+| c_startRound   | Client | Signals the current round should begin.                                                                                 | None                                                              |
+| s_roundStarted | Server | Signals the current round has begun.                                                                                    | None                                                              |
+| c_articleFound | Client | Signals the client has reached the destination article.                                                                 | None                                                              |
+| s_finishUpdate | Server | Provides updates to players who have found the article within the round. Time is in seconds.                            | `updates: [{ position: number, name: string, time: number }]`     |
+| s_leaderboard  | Server | Provides an overall leaderboard update for the match. In ascending rank (1, 2, 3, etc.). Sent at the end of each round. | `leaderboard: [{ name: string, points: number, change: number }]` |
+| c_endMatch     | Client | Signals the current match should end.                                                                                   | None                                                              |
+| s_results      | Server | Provides end-of-game results. Leaderboard is in ascending rank.                                                         | `leaderboard: [{ name: string, points: number }]`                 |
+| s_error        | Server | Alerts the client that their last message caused an error.                                                              | `message: string`                                                 |
+
+### Paths
+Whenever paths are sent to/from the server, they must only contain the Wikipedia URL path after `/wiki` (e.g. `"/List_of_programming_languages"`).
