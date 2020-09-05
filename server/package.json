@@ -5,7 +5,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "type-check": "tsc --noEmit",
     "type-check:watch": "npm run type-check -- --watch",
     "build": "npm run build:types && npm run build:js",
@@ -25,8 +25,12 @@
     "@babel/plugin-proposal-class-properties": "^7.10.4",
     "@babel/preset-env": "^7.11.0",
     "@babel/preset-typescript": "^7.10.4",
+    "@types/jest": "^26.0.12",
     "@types/uuid": "^8.3.0",
     "@types/ws": "^7.2.6",
+    "babel-jest": "^26.3.0",
+    "jest": "^26.4.2",
+    "ts-jest": "^26.3.0",
     "typescript": "^4.0.2"
   }
 }
