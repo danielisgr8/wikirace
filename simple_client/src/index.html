@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Client</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <div>
+      <input id="name" value="Name" />
+      <button class="event" id="join">Join</button>
+    </div>
+    <div>
+      <textarea id="reconnectText"></textarea>
+      <button class="event" id="reconnect">Reconnect</button>
+    </div>
+    <div><button class="event" id="startMatch">Start match</button></div>
+    <div>
+      <input id="source" value="Source" />
+      <button class="event" id="setSource">Set source</button>
+    </div>
+    <div>
+      <input id="dest" value="Dest" />
+      <button class="event" id="setDest">Set destination</button>
+    </div>
+    <div><button class="event" id="startRound">Start round</button></div>
+    <div><button class="event" id="articleFound">Article found</button></div>
+    <div><button class="event" id="endMatch">End match</button></div>
+
+    <textarea id="log" disabled></textarea>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
