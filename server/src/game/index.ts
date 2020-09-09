@@ -17,6 +17,7 @@ class GameModule {
   }
 
   public run(): void {
+    this.wsem.run();
     const pregameModule = new PregameModule(this.wsem);
     pregameModule.onStart = (clients) => {
       this.state.setUp(clients);
