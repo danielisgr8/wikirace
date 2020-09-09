@@ -72,6 +72,8 @@ class MatchModule extends NetworkingGameModule {
 
   private endMatchHandler() {
 
+  protected getIds(): Array<number> {
+    return this.state.getPlayers().map((player) => player.id);
   }
 }
 

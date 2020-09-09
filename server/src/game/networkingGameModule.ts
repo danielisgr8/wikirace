@@ -27,6 +27,15 @@ abstract class NetworkingGameModule {
   protected removeHandlers(): void {
     this.eventTuples.forEach(([event, handler]) => this.wsem.removeEventHandler(event, handler));
   }
+
+  protected abstract getIds(): Array<number>;
+
+  protected broadcastMessage(event: string, data: any, ignoreId?: number): void {
+    this.getIds().forEach((id) => {
+      if(ignoreId && ignoreId === id) return;
+      this.wsem.sendMessage(id, event, data);
+    }, this);
+  }
 }
 
 export default NetworkingGameModule;

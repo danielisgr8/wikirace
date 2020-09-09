@@ -38,6 +38,10 @@ class PregameModule extends NetworkingGameModule {
     this.cleanUp();
     if(this.onStart) this.onStart(Object.values(this.clients));
   }
+
+  protected getIds(): Array<number> {
+    return Object.keys(this.clients).map((str) => Number(str));
+  }
 }
 
 export default PregameModule;
