@@ -1,9 +1,9 @@
 import WebSocket from "ws";
 import { mocked } from "ts-jest/utils";
-
 import PregameModule from "./pregame";
-import WebSocketEventManager, { EventHandler } from "../networking/websocketEventManager";
+import WebSocketEventManager from "../networking/websocketEventManager";
 import { wsEvents } from "wikirace-shared";
+import ModuleTester from "../test-util/moduleTester";
 
 jest.mock("../networking/websocketEventManager");
 jest.mock("ws");
@@ -15,14 +15,7 @@ describe("PregameModule", () => {
   const expectedEvents = [wsEvents.c_join, wsEvents.c_startMatch];
 
   let pregameModule: PregameModule;
-  let startMatchHandler: EventHandler;
-  let joinHandler: EventHandler;
-
-  const getHandler = (eventName: String): EventHandler => {
-    const call = mockedWsem.addEventHandler.mock.calls.find(([event]) => event === eventName);
-    if(call) return call[1];
-    else fail();
-  }
+  let moduleTester: ModuleTester;
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -30,20 +23,19 @@ describe("PregameModule", () => {
     pregameModule = new PregameModule(wsem);
     pregameModule.run();
 
-    startMatchHandler = getHandler(wsEvents.c_startMatch);
-    joinHandler = getHandler(wsEvents.c_join);
+    moduleTester = new ModuleTester(mockedWsem, expectedEvents);
+    moduleTester.setHandlers();
   });
 
   test("Event handlers are correctly set", () => {
-    expect(mockedWsem.addEventHandler.mock.calls.length).toBe(expectedEvents.length);
-    expect(mockedWsem.addEventHandler.mock.calls.map(([event]) => event).sort()).toEqual(expectedEvents.sort());
+    moduleTester.testEventHandlerAdding();
   });
 
   test("onStart is called when starting the match", () => {
     const onStart = jest.fn();
     pregameModule.onStart = onStart;
 
-    startMatchHandler(1, null);
+    moduleTester.eventHandlers[wsEvents.c_startMatch](1, null);
 
     expect(onStart.mock.calls.length).toBe(1);
   });
@@ -54,15 +46,18 @@ describe("PregameModule", () => {
       { id: 1, name: "Greg Name-ison" }
     ];
 
+    let onStartRun = false;
     pregameModule.onStart = (clients) => {
       expect(clients).toEqual(epxectedClients);
+      onStartRun = true;
     };
 
     epxectedClients.forEach((client) => {
-      joinHandler(client.id, { name: client.name });
+      moduleTester.eventHandlers[wsEvents.c_join](client.id, { name: client.name });
     });
 
-    startMatchHandler(1, null);
+    moduleTester.eventHandlers[wsEvents.c_startMatch](1, null);
+    expect(onStartRun).toBe(true);
   });
 
   test("Client reconnects are tracked", () => {
@@ -72,7 +67,7 @@ describe("PregameModule", () => {
     ];
 
     clients.forEach((client) => {
-      joinHandler(client.id, { name: client.name });
+      moduleTester.eventHandlers[wsEvents.c_join](client.id, { name: client.name });
     });
 
     expect(mockedWsem.trackClientReconnect.mock.calls.length).toBe(2);
@@ -82,9 +77,6 @@ describe("PregameModule", () => {
   });
 
   test("Event handlers are removed on match start", () => {
-    startMatchHandler(1, null);
-
-    expect(mockedWsem.removeEventHandler.mock.calls.sort(([event1], [event2]) => event1.localeCompare(event2)))
-      .toEqual(expectedEvents.sort().map((event) => [event, getHandler(event)]));
+    moduleTester.testEventHandlerRemoval(() => moduleTester.eventHandlers[wsEvents.c_startMatch](1, null));
   });
 });
