@@ -38,4 +38,15 @@ describe("Round", () => {
       expect(id).toBe(expectedIdOrder[i]);
     });
   });
+
+  test("hasFinished", () => {
+    round.addTime(1, 123);
+    expect(round.hasFinished).toBe(false);
+
+    round.addTime(2, 124);
+    expect(round.hasFinished).toBe(false);
+
+    round.addTime(0, 125);
+    expect(round.hasFinished).toBe(true);
+  });
 });
