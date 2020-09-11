@@ -13,6 +13,10 @@
     "build:types": "tsc --emitDeclarationOnly",
     "build:js": "babel src --out-dir lib --extensions \".ts,.tsx\" --source-maps inline"
   },
+  "jest": {
+    "rootDir": "src",
+    "coverageDirectory": "../coverage"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
