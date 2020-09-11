@@ -30,8 +30,8 @@ class ModuleTester {
     this.setHandlers();
   }
 
-  public testEventHandlerRemoval(runBefore: Function): void {
-    runBefore();
+  public testEventHandlerRemoval(runBefore?: Function): void {
+    if(runBefore) runBefore();
 
     expect(this.mockedWsem.removeEventHandler.mock.calls.sort(([event1], [event2]) => event1.localeCompare(event2)))
       .toEqual(this.expectedEvents.sort().map((event) => [event, this.eventHandlers[event]]));

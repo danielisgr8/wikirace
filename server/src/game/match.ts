@@ -32,10 +32,10 @@ class MatchModule extends NetworkingGameModule {
     this.removeHandlers();
   }
 
-  private getRoundInfo(): { source: string | null, dest: string | null } {
+  private getRoundInfo(): { sourcePath: string | null, destPath: string | null } {
     return {
-      source: this.state.currentRound?.source || null,
-      dest: this.state.currentRound?.dest || null
+      sourcePath: this.state.currentRound?.source || null,
+      destPath: this.state.currentRound?.dest || null
     };
   }
 
@@ -43,7 +43,7 @@ class MatchModule extends NetworkingGameModule {
     if(!this.state.roundHasStarted) {
       if(this.state.currentRound.source === data.path) return;
       this.state.currentRound.source = data.path;
-     this.broadcastMessage(wsEvents.s_roundInfo, this.getRoundInfo(), id);
+      this.broadcastMessage(wsEvents.s_roundInfo, this.getRoundInfo(), id);
     }
   }
 
@@ -69,10 +69,10 @@ class MatchModule extends NetworkingGameModule {
         const time = this.stopwatch.getTime();
         this.state.currentRound.addTime(id, time);
 
-        this.broadcastMessage(wsEvents.s_finishUpdate, [{ id, time, position: this.state.currentRound.finishedCount }]);
+        this.broadcastMessage(wsEvents.s_finishUpdate, { updates: [{ id, time, position: this.state.currentRound.finishedCount }] });
         if(this.state.currentRound.hasFinished) {
           const leaderboard = this.state.endRound();
-          this.broadcastMessage(wsEvents.s_leaderboard, leaderboard);
+          this.broadcastMessage(wsEvents.s_leaderboard, { leaderboard });
         }
       } catch(err) {
         console.error(err.toString());
@@ -81,7 +81,7 @@ class MatchModule extends NetworkingGameModule {
   }
 
   private endMatchHandler(): void {
-
+    this.cleanUp();
   }
 
   protected getIds(): Array<number> {

@@ -125,7 +125,7 @@ class WebSocketEventManager {
     if(handlers) handlers.forEach((handler) => handler(id, parsedMessage.data));
   }
 
-  public sendMessage(id: number, event: string, data: any, queue = true): void {
+  public sendMessage(id: number, event: string, data: object, queue = true): void {
     const originalID = id;
     if(this.handleReconnects && this.reconnectMap.hasCurrentFor(id)) id = this.reconnectMap.getCurrent(id);
     const ws = this.clients[id];
