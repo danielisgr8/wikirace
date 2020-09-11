@@ -1,4 +1,4 @@
-import Round from "./round";
+import Round, { Status as RoundStatus } from "./round";
 import Player from "./player";
 
 describe("Round", () => {
@@ -15,7 +15,7 @@ describe("Round", () => {
   });
 
   test("Correct initial values", () => {
-    expect(round.started).toBe(false);
+    expect(round.status).toBe(RoundStatus.Unstarted);
     expect(round.getOrderedTimes().length).toBe(0);
   });
 

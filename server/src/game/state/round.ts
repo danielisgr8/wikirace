@@ -1,11 +1,17 @@
 import Player from "./player";
 
+enum Status {
+  Unstarted,
+  Started,
+  Ended
+};
+
 class Round {
   private players: { [id: number]: Player };
   private playerCount: number;
   private playerTimes: { [id: number]: number };
   
-  public started: boolean;
+  public status: Status;
   public source: string | undefined;
   public dest: string | undefined;
   public finishedCount: number;
@@ -13,7 +19,7 @@ class Round {
   public constructor(players: { [id: number]: Player }) {
     this.players = players;
     this.playerCount = Object.keys(players).length;
-    this.started = false;
+    this.status = Status.Unstarted;
     this.playerTimes = {};
     this.finishedCount = 0;
   }
@@ -38,3 +44,4 @@ class Round {
 }
 
 export default Round;
+export { Status };

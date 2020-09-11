@@ -42,7 +42,7 @@ class MatchModule extends NetworkingGameModule {
   }
 
   private setSourceHandler(id: number, data: { path: string }): void {
-    if(!this.state.currentRound.started) {
+    if(!this.state.roundHasStarted) {
       if(this.state.currentRound.source === data.path) return;
       this.state.currentRound.source = data.path;
      this.broadcastMessage(wsEvents.s_roundInfo, this.getRoundInfo(), id);
@@ -50,7 +50,7 @@ class MatchModule extends NetworkingGameModule {
   }
 
   private setDestHandler(id: number, data: { path: string }): void {
-    if(!this.state.currentRound.started) {
+    if(!this.state.roundHasStarted) {
       if(this.state.currentRound.dest === data.path) return;
       this.state.currentRound.dest = data.path;
       this.broadcastMessage(wsEvents.s_roundInfo, this.getRoundInfo(), id);
@@ -58,15 +58,15 @@ class MatchModule extends NetworkingGameModule {
   }
 
   private startRoundHandler(): void {
-    if(!this.state.currentRound.started) {
-      this.state.currentRound.started = true;
+    if(!this.state.roundHasStarted) {
+      this.state.startRound();
       this.stopwatch.start();
       this.broadcastMessage(wsEvents.s_roundStarted, null);
     }
   }
 
   private articleFoundHandler(id: number): void {
-    if(this.state.currentRound.started) {
+    if(this.state.roundHasStarted) {
       try {
         const time = this.stopwatch.getTime();
         this.state.currentRound.addTime(id, time);

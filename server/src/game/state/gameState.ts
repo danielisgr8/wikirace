@@ -1,6 +1,6 @@
 import Player from "./player";
 import Client from "../client";
-import Round from "./round";
+import Round, { Status as RoundStatus } from "./round";
 
 class GameState {
   private players: { [id: number]: Player};
@@ -16,6 +16,12 @@ class GameState {
     this.playerCount = 0;
     this.roundCount = 1;
     this.currentRound = new Round(this.players);
+  }
+
+  get roundHasStarted(): boolean { return this.currentRound.status === RoundStatus.Started }
+
+  public startRound(): void {
+    this.currentRound.status = RoundStatus.Started;
   }
 
   /**
@@ -38,6 +44,9 @@ class GameState {
   }
 
   public endRound(): Array<{ id: number, points: number, change: number }> {
+    if(this.currentRound.status !== RoundStatus.Started) throw new Error(`Current round status must be ${RoundStatus.Started}, was ${this.currentRound.status}`);
+    this.currentRound.status = RoundStatus.Ended;
+
     const objResult: { [id: string]: { points: number, change: number }} = {};
     Object.keys(this.players).forEach((key) => objResult[key] = { points: 0, change: 0 });
 
