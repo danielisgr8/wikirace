@@ -2,6 +2,18 @@
 Facilitates WebSocket messages and manages state for WikiRace.
 
 ## WebSocket events
+All WebSocket messages, whether sent from server to client or vice-versa, are of the following form:
+```json
+{
+  "event": "name",
+  "data": {
+    "prop1": "a",
+    "prop2": 2
+  }
+}
+```
+I.e. they are JSON objects with properties `event` (string) and `data` (object).
+
 | Event name     | Origin | Description                                                                                                             | Data properties                                                 |
 |----------------|--------|-------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------|
 | c_join         | Client | Sent when joining the game.                                                                                             | `name: string`                                                  |
@@ -21,5 +33,7 @@ Facilitates WebSocket messages and manages state for WikiRace.
 | s_results      | Server | Provides end-of-game results. Leaderboard is in ascending rank.                                                         | `leaderboard: [{ id: number, points: number }]`                 |
 | s_error        | Server | Alerts the client that their last message caused an error.                                                              | `message: string`                                               |
 
+If no data properties are specified, the `data` property SHOULD be ignored in a message. No guarantees are made about its contents. The property itself, however, MUST exist.
+
 ### Paths
-Whenever paths are sent to/from the server, they must only contain the Wikipedia URL path after `/wiki` (e.g. `"/List_of_programming_languages"`).
+Whenever paths are sent to/from the server, they MUST only contain the Wikipedia URL path after `/wiki` (e.g. `"/List_of_programming_languages"`).
