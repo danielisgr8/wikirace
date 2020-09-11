@@ -26,8 +26,6 @@ class MatchModule extends NetworkingGameModule {
 
   public run(): void {
     this.addHandlers();
-
-    this.state.setUpNextRound();
   }
 
   protected cleanUp(): void {

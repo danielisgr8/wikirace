@@ -18,7 +18,7 @@ class GameState {
     this.currentRound = new Round(this.players);
   }
 
-  get roundHasStarted(): boolean { return this.currentRound.status === RoundStatus.Started }
+  get roundHasStarted(): boolean { return this.currentRound.status !== RoundStatus.Unstarted }
 
   public startRound(): void {
     this.currentRound.status = RoundStatus.Started;

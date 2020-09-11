@@ -142,6 +142,6 @@ describe("GameState", () => {
     expect(gameState.roundHasStarted).toBe(true);
 
     mockedRoundInstance.status = RoundStatus.Ended;
-    expect(gameState.roundHasStarted).toBe(false);
+    expect(gameState.roundHasStarted).toBe(true);
   });
 });
