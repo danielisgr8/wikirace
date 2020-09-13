@@ -14,7 +14,7 @@ class GameModule {
   public constructor(wss: WebSocket.Server) {
     this.wsem = new WebSocketEventManager(wss, true);
     this.state = new GameState(uuidv4());
-    this.wsem.setSessionID(this.state.sessionId);
+    this.wsem.setSessionId(this.state.sessionId);
   }
 
   public run(): void {

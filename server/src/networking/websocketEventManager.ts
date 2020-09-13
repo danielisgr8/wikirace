@@ -47,16 +47,6 @@ class WebSocketEventManager {
     this.messageQueue = {};
   }
 
-  /** Clears all event handlers, clients, and the session ID */
-  public reset(): void {
-    this.events = {};
-    this.clients = {};
-    this.clientCount = 0;
-    this.reconnectMap = new ReconnectMap();
-    this.messageQueue = {};
-    this.sessionId = null;
-  }
-
   public run(): void {
     this.wss.on("connection", (ws) => {
       const id = this.clientCount++;
@@ -75,9 +65,9 @@ class WebSocketEventManager {
     if(this.handleReconnects) {
       this.addEventHandler(wsEvents.c_reconnect, (id, data) => {
         if(this.sessionId) {
-          if(data.sessionID === this.sessionId) {
-            this.reconnectMap.addMapping(data.clientID, id);
-            this.flushMessageQueue(data.clientID);
+          if(data.sessionId === this.sessionId) {
+            this.reconnectMap.addMapping(data.clientId, id);
+            this.flushMessageQueue(data.clientId);
           } else {
             this.sendMessage(id, wsEvents.s_error, { code: 0, message: "Invalid session ID" });
           }
@@ -86,11 +76,24 @@ class WebSocketEventManager {
     }
   }
 
+  /** Clears all event handlers, clients, and the session ID */
+  public reset(): void {
+    Object.keys(this.events).forEach((key) => {
+      if(!this.handleReconnects || key !== wsEvents.c_reconnect) delete this.events[key];
+    });
+    Object.values(this.clients).forEach((client) => client.terminate());
+    this.clients = {};
+    this.clientCount = 0;
+    this.reconnectMap = new ReconnectMap();
+    this.messageQueue = {};
+    this.sessionId = null;
+  }
+
   /**
    * Set an ID unique to this session/game/etc. A UUIDv4 is sufficient.
    * @param id 
    */
-  public setSessionID(id: string): void {
+  public setSessionId(id: string): void {
     this.sessionId = id;
   }
 
@@ -101,7 +104,7 @@ class WebSocketEventManager {
    * @param id 
    */
   public trackClientReconnect(id: number): void {
-    if(this.handleReconnects && this.sessionId) this.sendMessage(id, wsEvents.s_init, { clientID: id, sessionID: this.sessionId });
+    if(this.handleReconnects && this.sessionId) this.sendMessage(id, wsEvents.s_init, { clientId: id, sessionId: this.sessionId });
   }
 
   private addToMessageQueue(id: number, msg: WebSocketMessage): void {
@@ -131,7 +134,7 @@ class WebSocketEventManager {
   }
 
   private handleEvent(id: number, message: string): void {
-    console.log(`Received: ${message}`);
+    console.log(`Received from ${id}: ${message}`);
     const parsedMessage: WebSocketMessage = JSON.parse(message);
     if(this.handleReconnects && this.reconnectMap.hasOGFor(id)) id = this.reconnectMap.getOG(id);
 
@@ -140,19 +143,21 @@ class WebSocketEventManager {
   }
 
   public sendMessage(id: number, event: string, data: any, queue = true): void {
-    const originalID = id;
-    if(this.handleReconnects && this.reconnectMap.hasCurrentFor(id)) id = this.reconnectMap.getCurrent(id);
-    const ws = this.clients[id];
+    let currentId = id;
+    if(this.handleReconnects && this.reconnectMap.hasCurrentFor(id)) currentId = this.reconnectMap.getCurrent(id);
+
+    const ws = this.clients[currentId];
+    if(!ws) throw new Error(`No WebSocket connection found with ID ${id}${currentId !== id ? ` (currently ID ${currentId}` : ""}`);
 
     const msg = JSON.stringify({
       event,
       data
     });
 
-    if(this.handleReconnects && (ws.readyState === 2 || ws.readyState === 3) && queue) {
-      this.addToMessageQueue(originalID, { event, data });
-    } else {
-      console.log(`Sending: ${msg}`);
+    if(this.handleReconnects && (ws.readyState === WebSocket.CLOSING || ws.readyState === WebSocket.CLOSED) && queue) {
+      this.addToMessageQueue(id, { event, data });
+    } else if(ws.readyState === WebSocket.OPEN) {
+      console.log(`Sending to ${currentId}: ${msg}`);
       ws.send(msg);
     }
   }
