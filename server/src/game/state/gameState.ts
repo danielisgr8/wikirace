@@ -48,7 +48,7 @@ class GameState {
     this.currentRound.status = RoundStatus.Ended;
 
     const objResult: { [id: string]: { points: number, change: number }} = {};
-    Object.keys(this.players).forEach((key) => objResult[key] = { points: 0, change: 0 });
+    Object.keys(this.players).forEach((key) => objResult[key] = { points: this.players[Number(key)].score, change: 0 });
 
     this.currentRound.getOrderedTimes().forEach(({ id }, index) => {
       const pointsThisRound = this.playerCount - index;

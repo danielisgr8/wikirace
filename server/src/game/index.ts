@@ -5,6 +5,7 @@ import WebSocketEventManager from "../networking/websocketEventManager";
 import GameState from "./state/gameState";
 import PregameModule from "./pregame";
 import { wsEvents } from "wikirace-shared";
+import MatchModule from "./match";
 
 class GameModule {
   private wsem: WebSocketEventManager;
@@ -25,9 +26,13 @@ class GameModule {
       this.state.getPlayers().forEach((player) => {
         this.wsem.sendMessage(player.id, wsEvents.s_players, { players: names });
       });
+
+      const matchModule = new MatchModule(this.wsem, this.state);
+      matchModule.onMatchEnd = () => console.log("Match ended");
+      matchModule.run();
     };
     pregameModule.run();
   }
 }
 
-export default GameModule
+export default GameModule;
