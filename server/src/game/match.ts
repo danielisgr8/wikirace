@@ -5,6 +5,8 @@ import { wsEvents } from "wikirace-shared";
 import Stopwatch from "../util/stopwatch";
 
 class MatchModule extends NetworkingGameModule {
+  public onMatchEnd: (() => void) | undefined;
+
   private state: GameState;
   private stopwatch: Stopwatch;
 
@@ -81,6 +83,12 @@ class MatchModule extends NetworkingGameModule {
   }
 
   private endMatchHandler(): void {
+    if(!this.state.roundHasStarted) this.state.startRound();
+    const leaderboard = this.state.endRound().map(({ id, points }) => ({ id, points }));
+    this.broadcastMessage(wsEvents.s_results, { leaderboard });
+
+    if(this.onMatchEnd) this.onMatchEnd();
+
     this.cleanUp();
   }
 
