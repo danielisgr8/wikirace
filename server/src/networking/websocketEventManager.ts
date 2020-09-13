@@ -47,6 +47,16 @@ class WebSocketEventManager {
     this.messageQueue = {};
   }
 
+  /** Clears all event handlers, clients, and the session ID */
+  public reset(): void {
+    this.events = {};
+    this.clients = {};
+    this.clientCount = 0;
+    this.reconnectMap = new ReconnectMap();
+    this.messageQueue = {};
+    this.sessionId = null;
+  }
+
   public run(): void {
     this.wss.on("connection", (ws) => {
       const id = this.clientCount++;
@@ -64,9 +74,13 @@ class WebSocketEventManager {
 
     if(this.handleReconnects) {
       this.addEventHandler(wsEvents.c_reconnect, (id, data) => {
-        if(this.sessionId && data.sessionID === this.sessionId) {
-          this.reconnectMap.addMapping(data.clientID, id);
-          this.flushMessageQueue(data.clientID);
+        if(this.sessionId) {
+          if(data.sessionID === this.sessionId) {
+            this.reconnectMap.addMapping(data.clientID, id);
+            this.flushMessageQueue(data.clientID);
+          } else {
+            this.sendMessage(id, wsEvents.s_error, { code: 0, message: "Invalid session ID" });
+          }
         }
       });
     }
@@ -125,7 +139,7 @@ class WebSocketEventManager {
     if(handlers) handlers.forEach((handler) => handler(id, parsedMessage.data));
   }
 
-  public sendMessage(id: number, event: string, data: object, queue = true): void {
+  public sendMessage(id: number, event: string, data: any, queue = true): void {
     const originalID = id;
     if(this.handleReconnects && this.reconnectMap.hasCurrentFor(id)) id = this.reconnectMap.getCurrent(id);
     const ws = this.clients[id];
