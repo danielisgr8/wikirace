@@ -204,7 +204,7 @@ describe("MatchModule", () => {
         expect(mockedWsem.sendMessage.mock.calls.length).toBe(players.length * (players.length - 1));
         for(let i = 0; i < players.length - 1; i++) {
           for(let j = 0; j < players.length; j++) {
-            const [id, event, data] = <[number, string, any]> mockedWsem.sendMessage.mock.calls[i * players.length + j];
+            const [id, event, data] = mockedWsem.sendMessage.mock.calls[i * players.length + j];
             expect(id).toBe(j);
             expect(event).toBe(wsEvents.s_finishUpdate);
             expect(data.updates.length).toBe(1);
@@ -235,7 +235,7 @@ describe("MatchModule", () => {
   
         test("successfully notifies clients", () => {
           for(let i = 0; i < players.length; i++) {
-            const [id, event, data] = <[number, string, any]> mockedWsem.sendMessage.mock.calls[(players.length - 1) * players.length + i];
+            const [id, event, data] = mockedWsem.sendMessage.mock.calls[(players.length - 1) * players.length + i];
             expect(id).toBe(i);
             expect(event).toBe(wsEvents.s_finishUpdate);
             expect(data.updates.length).toBe(1);
@@ -243,7 +243,7 @@ describe("MatchModule", () => {
           }
 
           for(let i = 0; i < players.length; i++) {
-            const [id, event, data] = <[number, string, any]> mockedWsem.sendMessage.mock.calls[Math.pow(players.length, 2) + i];
+            const [id, event, data] = mockedWsem.sendMessage.mock.calls[Math.pow(players.length, 2) + i];
             expect(id).toBe(i);
             expect(event).toBe(wsEvents.s_leaderboard);
             expect(data.leaderboard).toEqual(leaderboard);
@@ -264,12 +264,28 @@ describe("MatchModule", () => {
   });
 
   describe("Ending match", () => {
+    let leaderboard: Array<{ id: number, points: number, change: number }>;
+    let onMatchEnd: jest.Mock;
+
     beforeEach(() => {
+      leaderboard = [{ id: 123, points: 999, change: 50 }];
+      mockedGameState.endRound.mockReturnValue(leaderboard);
+
+      onMatchEnd = jest.fn();
+      matchModule.onMatchEnd = onMatchEnd;
+
       moduleTester.eventHandlers[wsEvents.c_endMatch](1, null);
     });
 
     test("successfully notifies clients", () => {
-      // TODO:
+      expect(mockedWsem.sendMessage.mock.calls.length).toBe(players.length);
+      mockedWsem.sendMessage.mock.calls.sort(([id1], [id2]) => id1 - id2).forEach(([id, event, data], index) => {
+        expect(id).toBe(players[index].id);
+        expect(event).toBe(wsEvents.s_results);
+        expect(data.leaderboard).toEqual([{ id: leaderboard[0].id, points: leaderboard[0].points }]);
+      });
+
+      expect(onMatchEnd.mock.calls.length).toBe(1);
     });
 
     test("removed handlers", () => {
