@@ -1,5 +1,5 @@
 # WikiRace Server
-Facilitates WebSocket messages and manages state for WikiRace.
+Facilitates WebSocket messages and manages state for Wikirace.
 
 ## WebSocket events
 All WebSocket messages, whether sent from server to client or vice-versa, are of the following form:
