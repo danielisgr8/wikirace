@@ -1,0 +1,19 @@
+.App {
+  text-align: center;
+  height: 100%;
+  width: 100%;
+  margin: 0 auto;
+
+  background-color: white;
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .App {
+    width: 80vh;
+  }
+}
+
+.ant-layout-header {
+  color: white;
+  font-size: x-large;
+}
