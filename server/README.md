@@ -41,4 +41,4 @@ If no data properties are specified, the `data` property SHOULD be ignored in a 
 | 0    | Invalid session ID |
 
 ### Paths
-Whenever paths are sent to/from the server, they MUST only contain the Wikipedia URL path after `/wiki` (e.g. `"/List_of_programming_languages"`).
+Whenever paths are sent to/from the server, they MUST only contain the Wikipedia URL path after `/wiki/` (e.g. `"List_of_programming_languages"`).
