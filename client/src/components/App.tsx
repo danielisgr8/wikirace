@@ -7,10 +7,13 @@ import { Layout } from "antd";
 import { wsEvents } from "wikirace-shared";
 
 import Home from "./Home";
-import WebSocketEventManager from "./networking/websocketEventManager";
+import WebSocketEventManager from "../networking/websocketEventManager";
 
 import "antd/dist/antd.css";
 import "./App.scss";
+import Waiting from "./Waiting";
+import Player from "../models/player";
+import Round from "./Round";
 
 const { Header, Content } = Layout;
 
@@ -19,8 +22,8 @@ const isSessionPath = () => ["/", "/end"].every(path => window.location.pathname
 function App({ wsem }: { wsem: WebSocketEventManager }) {
   // TODO: show some toast on wsem disconnect
 
-  const [source, setSource] = useState("");
-  const [dest, setDest] = useState("");
+  const [name, setName] = useState("");
+  const [players, setPlayers] = useState<Array<Player>>([]);
 
   useEffect(() => {
     if(isSessionPath() &&
@@ -44,6 +47,14 @@ function App({ wsem }: { wsem: WebSocketEventManager }) {
     }
   }, [wsem]);
 
+  const onNameSubmit = (name: string) => {
+    setName(name);
+  };
+
+  const onPlayers = (players: Array<Player>) => {
+    setPlayers(players);
+  };
+
   return (
     <Router>
       <Layout className="App">
@@ -52,9 +63,9 @@ function App({ wsem }: { wsem: WebSocketEventManager }) {
         </Header>
 
         <Content style={{ padding: "0.5rem 0.5rem" }}>
-          <Route path="/" exact render={({ history }) => <Home wsem={wsem} history={history} />} />
-          <Route path="/round/waiting" />
-          <Route path="/round" exact />
+          <Route path="/" exact render={({ history }) => <Home wsem={wsem} history={history} onSubmit={onNameSubmit} />} />
+          <Route path="/round/waiting" render={({ history }) => <Waiting wsem={wsem} name={name} history={history} onPlayers={onPlayers} />}/>
+          <Route path="/round" exact render={() => <Round wsem={wsem} />} />
           <Route path="/end" />
         </Content>
       </Layout>

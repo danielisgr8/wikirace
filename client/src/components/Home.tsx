@@ -1,12 +1,19 @@
 import React from "react";
 import { Form, Input, Button } from "antd";
 import { History } from "history";
-
-import WebSocketEventManager from "./networking/websocketEventManager";
 import { wsEvents } from "wikirace-shared";
 
-const Home = ({ wsem, history }: { wsem: WebSocketEventManager, history: History }) => {
+import WebSocketEventManager from "../networking/websocketEventManager";
+
+type HomeProps  = {
+  wsem: WebSocketEventManager,
+  history: History,
+  onSubmit: (name: string) => void
+}
+
+const Home = ({ wsem, history, onSubmit }: HomeProps) => {
   const onFinish = (name: string) => {
+    onSubmit(name);
     wsem.sendMessage(wsEvents.c_join, { name });
     history.push("/round/waiting");
   };
