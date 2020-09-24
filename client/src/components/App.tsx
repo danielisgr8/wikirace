@@ -35,14 +35,14 @@ function App({ wsem }: { wsem: WebSocketEventManager }) {
         // TODO: clear local storage and add s_init event handler (turn else statement below into function)
       });
       wsem.sendMessage(wsEvents.c_reconnect, {
-        clientID: Number(localStorage.getItem("clientId")),
-        sessionID: localStorage.getItem("sessionId")
+        clientId: Number(localStorage.getItem("clientId")),
+        sessionId: localStorage.getItem("sessionId")
       });
     } else {
       localStorage.clear();
       wsem.addEventHandler(wsEvents.s_init, (data) => {
-        localStorage.setItem("clientId", data.clientID);
-        localStorage.setItem("sessionId", data.sessionID);
+        localStorage.setItem("clientId", data.clientId);
+        localStorage.setItem("sessionId", data.sessionId);
       });
     }
   }, [wsem]);
