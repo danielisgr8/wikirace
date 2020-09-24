@@ -16,7 +16,7 @@ const WikiLink = ({ labelTitle, title, path, error }: WikiLinkProps) => {
         : (
           title === ""
             ? "None"
-            : <a href={`https://en.wikipedia.org/wiki/${path}`}>{title}</a>
+            : <a href={`https://en.wikipedia.org/wiki/${path}`} target="_blank" rel="noopener noreferrer">{title}</a>
           )
       }
     </>

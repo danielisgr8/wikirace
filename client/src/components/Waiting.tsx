@@ -28,7 +28,7 @@ const Waiting = ({ wsem, history, name, onPlayers }: WaitingProps) => {
   return (
     <div>
       <h2>Welcome, {name}!</h2>
-      <Button type="primary">Start match</Button>
+      <Button type="primary" onClick={() => wsem.sendMessage(wsEvents.c_startMatch, null)}>Start match</Button>
     </div>
   );
 };

@@ -31,7 +31,6 @@ const Home = ({ wsem, history, onSubmit }: HomeProps) => {
       </Form.Item>
     </Form>
   )
-
 };
 
 export default Home;

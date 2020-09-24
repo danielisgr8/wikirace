@@ -65,7 +65,7 @@ function App({ wsem }: { wsem: WebSocketEventManager }) {
         <Content style={{ padding: "0.5rem 0.5rem" }}>
           <Route path="/" exact render={({ history }) => <Home wsem={wsem} history={history} onSubmit={onNameSubmit} />} />
           <Route path="/round/waiting" render={({ history }) => <Waiting wsem={wsem} name={name} history={history} onPlayers={onPlayers} />}/>
-          <Route path="/round" exact render={() => <Round wsem={wsem} />} />
+          <Route path="/round" exact render={() => <Round wsem={wsem} players={players} />} />
           <Route path="/end" />
         </Content>
       </Layout>
