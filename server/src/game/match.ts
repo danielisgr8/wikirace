@@ -36,8 +36,8 @@ class MatchModule extends NetworkingGameModule {
 
   private getRoundInfo(): { sourcePath: string | null, destPath: string | null } {
     return {
-      sourcePath: this.state.currentRound?.source || null,
-      destPath: this.state.currentRound?.dest || null
+      sourcePath: this.state.currentRound.source || null,
+      destPath: this.state.currentRound.dest || null
     };
   }
 
