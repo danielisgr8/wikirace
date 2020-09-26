@@ -214,6 +214,9 @@ describe("MatchModule", () => {
       });
 
       describe("and round has finished", () => {
+        const source = "source.lank";
+        const dest = "dest.link";
+
         let leaderboard: Array<{ id: number, points: number, change: number }>;
 
         beforeEach(() => {
@@ -221,6 +224,8 @@ describe("MatchModule", () => {
 
           mockedRound.hasFinished = true;
           mockedRound.finishedCount = players.length;
+          mockedGameState.currentRound.source = source;
+          mockedGameState.currentRound.dest = dest;
           mockedGameState.endRound.mockReturnValue(leaderboard);
           moduleTester.eventHandlers[wsEvents.c_articleFound](players.length - 1, null);
         });
@@ -247,6 +252,21 @@ describe("MatchModule", () => {
             expect(id).toBe(i);
             expect(event).toBe(wsEvents.s_leaderboard);
             expect(data.leaderboard).toEqual(leaderboard);
+          }
+        });
+
+        test("successfully starts next round", () => {
+          expect(mockedGameState.setUpNextRound.mock.calls.length).toBe(1);
+        });
+
+        test("successfully notifies clients of new round info", () => {
+          const startIndex = Math.pow(players.length, 2) + players.length;
+          for(let i = startIndex; i < startIndex + players.length; i++) {
+            const [id, event, data] = mockedWsem.sendMessage.mock.calls[i];
+            expect(id).toBe(i - startIndex);
+            expect(event).toBe(wsEvents.s_roundInfo);
+            expect(data.sourcePath).toEqual(source);
+            expect(data.destPath).toBe(dest);
           }
         });
       })
