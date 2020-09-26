@@ -13,7 +13,10 @@ describe("GameState", () => {
 
   let gameState: GameState;
   let mockedRound: MaybeMockedDeep<typeof Round>;
-  let mockedRoundInstance: MaybeMockedDeep<Round>;
+
+  const getCurrentMockedRound = () => {
+    return mocked(mockedRound.mock.instances[mockedRound.mock.instances.length - 1], true);
+  };
 
   beforeAll(() => {
     mockedRound = mocked(Round, true);
@@ -23,9 +26,6 @@ describe("GameState", () => {
     jest.resetAllMocks();
 
     gameState = new GameState(sessionId);
-
-    expect(mockedRound.mock.instances.length).toBe(1);
-    mockedRoundInstance = mocked(mockedRound.mock.instances[0], true);
   });
 
   test("getPlayers returns correctly-ordered players", () => {
@@ -61,11 +61,9 @@ describe("GameState", () => {
     expect(gameState.roundCount).toBe(2);
   });
 
-  test("endRound throws exception if round has not started", () => {
-    expect(() => gameState.endRound()).toThrow();
-  });
-
   describe("endRound", () => {
+    let mockedRoundInstance: MaybeMockedDeep<Round>;
+
     beforeEach(() => {
       const clients = [
         new Client(0, "Client0"),
@@ -73,17 +71,24 @@ describe("GameState", () => {
         new Client(2, "Client2"),
       ];
       gameState.setUp(clients);
-      gameState.startRound();
+
+      mockedRoundInstance = getCurrentMockedRound();
+    });
+
+    test("endRound throws exception if round has not started", () => {
+      mockedRoundInstance.status = RoundStatus.Unstarted;
+
+      expect(() => gameState.endRound()).toThrow();
     });
 
     test("endRound throws exception if round has already ended", () => {
-      mockedRoundInstance.getOrderedTimes.mockReturnValue([]);
+      mockedRoundInstance.status = RoundStatus.Ended;
 
-      gameState.endRound();
       expect(() => gameState.endRound()).toThrow();
     });
 
     test("returns correct data when all players finished", () => {
+      mockedRoundInstance.status = RoundStatus.Started;
       mockedRoundInstance.getOrderedTimes.mockReturnValue([
         { id: 2, time: 123 },
         { id: 0, time: 124 },
@@ -101,7 +106,7 @@ describe("GameState", () => {
 
       gameState.setUpNextRound();
       gameState.startRound();
-      mocked(mockedRound.mock.instances[1].getOrderedTimes, true).mockReturnValue([
+      getCurrentMockedRound().getOrderedTimes.mockReturnValue([
         { id: 1, time: 123 },
         { id: 2, time: 124 },
         { id: 0, time: 125 }
@@ -118,6 +123,7 @@ describe("GameState", () => {
     });
 
     test("returns correct data when not all players finished", () => {
+      mockedRoundInstance.status = RoundStatus.Started;
       mockedRoundInstance.getOrderedTimes.mockReturnValue([
         { id: 2, time: 123 },
         { id: 0, time: 124 }
@@ -135,6 +141,8 @@ describe("GameState", () => {
   });
 
   test("hasRoundStarted", () => {
+    const mockedRoundInstance = getCurrentMockedRound();
+
     mockedRoundInstance.status = RoundStatus.Unstarted;
     expect(gameState.roundHasStarted).toBe(false);
 

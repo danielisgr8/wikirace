@@ -34,6 +34,11 @@ class MatchModule extends NetworkingGameModule {
     this.removeHandlers();
   }
 
+  private setUpNextRound(): void {
+    this.state.setUpNextRound();
+    this.broadcastMessage(wsEvents.s_roundInfo, this.getRoundInfo());
+  }
+
   private getRoundInfo(): { sourcePath: string | null, destPath: string | null } {
     return {
       sourcePath: this.state.currentRound.source || null,
@@ -75,6 +80,7 @@ class MatchModule extends NetworkingGameModule {
         if(this.state.currentRound.hasFinished) {
           const leaderboard = this.state.endRound();
           this.broadcastMessage(wsEvents.s_leaderboard, { leaderboard });
+          this.setUpNextRound();
         }
       } catch(err) {
         console.error(err.toString());
