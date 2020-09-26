@@ -22,9 +22,9 @@ class GameModule {
     const pregameModule = new PregameModule(this.wsem);
     pregameModule.onStart = (clients) => {
       this.state.setUp(clients);
-      const names = this.state.getPlayers().map((player) => player.name);
+      const players = this.state.getPlayers().map((player) => ({ id: player.id, name: player.name }));
       this.state.getPlayers().forEach((player) => {
-        this.wsem.sendMessage(player.id, wsEvents.s_players, { players: names });
+        this.wsem.sendMessage(player.id, wsEvents.s_players, { players });
       });
 
       const matchModule = new MatchModule(this.wsem, this.state);

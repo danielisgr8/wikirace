@@ -34,6 +34,7 @@ class GameState {
   public setUp(clients: Array<Client>): void {
     clients.forEach((client) => this.players[client.id] = new Player(client.id, client.name));
     this.playerCount = Object.values(this.players).length;
+    this.currentRound = new Round(this.players);
   }
 
   public setUpNextRound(): void {
