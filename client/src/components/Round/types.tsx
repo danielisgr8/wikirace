@@ -1,5 +1,7 @@
 export type WikiData = {
   path: string,
   title: string,
-  error: boolean
+  error: boolean,
+  oldPath?: string,
+  oldTitle?: string
 };

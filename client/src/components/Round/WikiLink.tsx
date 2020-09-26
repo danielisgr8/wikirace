@@ -4,19 +4,21 @@ type WikiLinkProps = {
   labelTitle: string,
   title: string,
   path: string,
-  error: boolean
+  error: boolean,
+  oldPath?: string,
+  oldTitle?: string
 }
 
-const WikiLink = ({ labelTitle, title, path, error }: WikiLinkProps) => {
+const WikiLink = ({ labelTitle, title, path, error, oldPath, oldTitle }: WikiLinkProps) => {
   return (
     <>
       {labelTitle}: {
       error
-        ? <p className="error">Error getting title for: {path}</p> 
+        ? <p className="error">Error getting title for: {oldPath || path}</p> 
         : (
-          title === ""
+          ((oldPath !== undefined && oldPath === "") || (oldPath === undefined && title === ""))
             ? "None"
-            : <a href={`https://en.wikipedia.org/wiki/${path}`} target="_blank" rel="noopener noreferrer">{title}</a>
+            : <a href={`https://en.wikipedia.org/wiki/${oldPath || path}`} target="_blank" rel="noopener noreferrer">{oldTitle || title}</a>
           )
       }
     </>

@@ -59,7 +59,7 @@ function App({ wsem }: { wsem: WebSocketEventManager }) {
     <Router>
       <Layout className="App">
         <Header>
-          <b>Wikirace</b>
+          <a href="/" style={{ color: "inherit", textDecoration: "none" }}><b>Wikirace</b></a>
         </Header>
 
         <Content style={{ padding: "0.5rem 0.5rem" }}>

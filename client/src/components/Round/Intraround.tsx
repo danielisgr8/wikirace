@@ -2,20 +2,22 @@ import React, { useState, useEffect } from "react";
 import { Row, Col, Button } from "antd";
 import { wsEvents } from "wikirace-shared";
 
-import WikiLink from "./Round/WikiLink";
-import WebSocketEventManager from "../networking/websocketEventManager";
-import { WikiData } from "./Round/types";
-import Player from "../models/player";
-import { TimeLeaderboard } from "./Round/Leaderboards";
+import WikiLink from "./WikiLink";
+import WebSocketEventManager from "../../networking/websocketEventManager";
+import { WikiData } from "./types";
+import Player from "../../models/player";
+import { TimeLeaderboard } from "./Leaderboards";
 
 type IntraroundProps = {
   wsem: WebSocketEventManager,
   source: WikiData,
   dest: WikiData,
-  players: Array<Player>
+  players: Array<Player>,
+  allowLeaderboard: boolean,
+  onLeaderboardClick: () => void
 };
 
-const Intraround = ({ wsem, source, dest, players }: IntraroundProps) => {
+const Intraround = ({ wsem, source, dest, players, allowLeaderboard, onLeaderboardClick }: IntraroundProps) => {
   const [finishedPlayers, setFinishedPlayers] = useState<Array<Player>>([]);
   const [articleFound, setArticleFound] = useState(false);
 
@@ -40,6 +42,18 @@ const Intraround = ({ wsem, source, dest, players }: IntraroundProps) => {
 
   return (
     <div>
+      <Row>
+        <Col span={8} />
+        <Col span={8} style={{ justifyContent: "center" }}>
+          <Button type="primary" size="large" disabled={articleFound} onClick={() => {
+            setArticleFound(true);
+            wsem.sendMessage(wsEvents.c_articleFound, null);
+          }}>Article found</Button>
+        </Col>
+        <Col span={8} style={{ justifyContent: "center" }}>
+          <Button type="primary" size="large" onClick={onLeaderboardClick} style={{ visibility: allowLeaderboard ? "visible" : "hidden" }}>Leaderboard</Button>
+        </Col>
+      </Row>
       <Row gutter={[16, 16]} style={{ textAlign: "left", fontSize: "x-large" }}>
         <Col span={12}>
           <WikiLink labelTitle="Start" {...source} />
@@ -49,12 +63,6 @@ const Intraround = ({ wsem, source, dest, players }: IntraroundProps) => {
         </Col>
       </Row>
       <Row style={{ justifyContent: "center" }}>
-        <Button type="primary" size="large" disabled={articleFound} onClick={() => {
-          setArticleFound(true);
-          wsem.sendMessage(wsEvents.c_articleFound, null);
-        }}>Article found</Button>
-      </Row>
-      <Row>
         <TimeLeaderboard playerCount={players.length} finishedPlayers={finishedPlayers} />
       </Row>
     </div>
