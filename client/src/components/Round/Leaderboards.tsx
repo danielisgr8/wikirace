@@ -42,7 +42,7 @@ const TimeLeaderboard = ({ playerCount, finishedPlayers}: TimeLeaderboardProps) 
     data[i] = element;
   }
 
-  return <Table columns={timeLeaderBoardColumns} dataSource={data} />;
+  return <Table columns={timeLeaderBoardColumns} dataSource={data} pagination={false} />;
 };
 
 type ScoreLeaderboardProps = {
@@ -82,7 +82,7 @@ const ScoreLeaderboard = ({ players }: ScoreLeaderboardProps) => {
     change: player.change
   }));
 
-  return <Table columns={scoreLeaderBoardColumns} dataSource={data} />;
+  return <Table columns={scoreLeaderBoardColumns} dataSource={data} pagination={false} />;
 };
 
 export { TimeLeaderboard, ScoreLeaderboard };

@@ -18,6 +18,8 @@ const Round = ({ wsem, players }: RoundProps) => {
   const [source, setSource] = useState({ path: "", title: "", error: false });
   const [dest, setDest] = useState({ path: "", title: "", error: false });
   const [roundStarted, setRoundStarted] = useState(false);
+  const [articleFound, setArticleFound] = useState(false);
+  const [roundEnded, setRoundEnded] = useState(false);
   const [finishedPlayers, setFinishedPlayers] = useState<Array<Player>>([]);
 
   useEffect(() => {
@@ -30,7 +32,7 @@ const Round = ({ wsem, players }: RoundProps) => {
 
     wsem.addEventHandler(wsEvents.s_finishUpdate, (data) => {
       data.updates.forEach((update: any) => {
-        const player = players.find(update.id);
+        const player = players.find((player) => player.id === update.id);
         if(player) {
           player.time = update.time;
           if(finishedPlayers.includes(player)) setFinishedPlayers((old) => [...old]);
@@ -72,7 +74,10 @@ const Round = ({ wsem, players }: RoundProps) => {
     ? (
       <>
         <Row style={{ justifyContent: "center" }}>
-          <Button type="primary" size="large" >Article found</Button>
+          {articleFound && <Button type="primary" size="large" disabled={articleFound} onClick={() => {
+            setArticleFound(true);
+            wsem.sendMessage(wsEvents.c_articleFound, null);
+          }}>Article found</Button>}
         </Row>
         <Row>
           <TimeLeaderboard playerCount={players.length} finishedPlayers={finishedPlayers} />
@@ -101,7 +106,7 @@ const Round = ({ wsem, players }: RoundProps) => {
       {
         !roundStarted
           ? <Row style={{margin: "2rem 0", justifyContent: "center"}}>
-              <Button type="primary" size="large">Start round</Button>
+              <Button type="primary" size="large" onClick={() => wsem.sendMessage(wsEvents.c_startRound, null)}>Start round</Button>
             </Row>
           : null
       }
