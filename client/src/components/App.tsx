@@ -3,7 +3,8 @@ import {
   BrowserRouter as Router,
   Route
 } from "react-router-dom";
-import { Layout } from "antd";
+import { Layout, Modal } from "antd";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { wsEvents } from "wikirace-shared";
 
 import Home from "./Home";
@@ -18,6 +19,7 @@ import Round from "./Round";
 const { Header, Content } = Layout;
 
 const isSessionPath = () => ["/", "/end"].every(path => window.location.pathname !== path);
+const { confirm } = Modal;
 
 function App({ wsem }: { wsem: WebSocketEventManager }) {
   // TODO: show some toast on wsem disconnect
@@ -47,6 +49,16 @@ function App({ wsem }: { wsem: WebSocketEventManager }) {
     }
   }, [wsem]);
 
+  const onHeaderClick = () => {
+    confirm({
+      title: "Are you sure you want to leave the game?",
+      icon: <ExclamationCircleOutlined />,
+      onOk() {
+        window.location.href = "/";
+      }
+    });
+  };
+
   const onNameSubmit = (name: string) => {
     setName(name);
   };
@@ -59,7 +71,7 @@ function App({ wsem }: { wsem: WebSocketEventManager }) {
     <Router>
       <Layout className="App">
         <Header>
-          <a href="/" style={{ color: "inherit", textDecoration: "none" }}><b>Wikirace</b></a>
+          <a onClick={(e) => { e.preventDefault(); onHeaderClick(); }} href="/" style={{ color: "inherit", textDecoration: "none" }}><b>Wikirace</b></a>
         </Header>
 
         <Content style={{ padding: "0.5rem 0.5rem" }}>
