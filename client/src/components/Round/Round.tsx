@@ -48,7 +48,7 @@ const Round = ({ wsem, players }: RoundProps) => {
       wsem.removeEventHandler(wsEvents.s_roundStarted);
       wsem.removeEventHandler(wsEvents.s_leaderboard);
     };
-  }, [wsem, players]);
+  }, [wsem, players, setDest, setRoundEnded, setRoundStarted, setSource]);
 
   const updateWikiDate = (path: string, update: React.Dispatch<React.SetStateAction<WikiData>>) => {
     if(path !== "") {
@@ -65,11 +65,11 @@ const Round = ({ wsem, players }: RoundProps) => {
 
   useEffect(() => {
     updateWikiDate(source.path, setSource);
-  }, [source.path]);
+  }, [source.path, setSource]);
 
   useEffect(() => {
     updateWikiDate(dest.path, setDest);
-  }, [dest.path]);
+  }, [dest.path, setDest]);
 
   const onNewSource = (path: string) => setSource({ ...source, path });
   const onNewDest = (path: string) => setDest({ ...dest, path });
