@@ -76,9 +76,9 @@ describe("MatchModule", () => {
       });
 
       test("successfully notifies clients", () => {
-        expect(mockedWsem.sendMessage.mock.calls.length).toBe(players.length);
+        expect(mockedWsem.sendMessage.mock.calls.length).toBe(players.length - 1);
         mockedWsem.sendMessage.mock.calls.sort(([id1], [id2]) => id1 - id2).forEach(([id, event, data], index) => {
-          expect(id).toBe(players[index].id);
+          expect(id).toBe(players[index + 1].id);
           expect(event).toBe(wsEvents.s_roundInfo);
           expect(data).toEqual({ sourcePath: path, destPath: null });
         });
@@ -115,9 +115,9 @@ describe("MatchModule", () => {
       });
 
       test("successfully notifies clients", () => {
-        expect(mockedWsem.sendMessage.mock.calls.length).toBe(players.length);
+        expect(mockedWsem.sendMessage.mock.calls.length).toBe(players.length - 1);
         mockedWsem.sendMessage.mock.calls.sort(([id1], [id2]) => id1 - id2).forEach(([id, event, data], index) => {
-          expect(id).toBe(players[index].id);
+          expect(id).toBe(players[index + 1].id);
           expect(event).toBe(wsEvents.s_roundInfo);
           expect(data).toEqual({ sourcePath: null, destPath: path });
         });

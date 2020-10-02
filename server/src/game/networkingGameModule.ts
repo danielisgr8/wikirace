@@ -32,7 +32,7 @@ abstract class NetworkingGameModule {
 
   protected broadcastMessage(event: string, data: any, ignoreId?: number): void {
     this.getIds().forEach((id) => {
-      if(ignoreId && ignoreId === id) return;
+      if(ignoreId !== undefined && ignoreId === id) return;
       this.wsem.sendMessage(id, event, data);
     }, this);
   }
