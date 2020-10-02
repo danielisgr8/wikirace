@@ -80,4 +80,30 @@ describe("PregameModule", () => {
   test("Event handlers are removed on match start", () => {
     moduleTester.testEventHandlerRemoval(() => moduleTester.eventHandlers[wsEvents.c_startMatch](1, null));
   });
+
+  test("s_lobbyUpdate sent successfully", () => {
+    const clients = [
+      { id: 0, name: "Daniel" },
+      { id: 1, name: "Greg Name-ison" }
+    ];
+
+    moduleTester.eventHandlers[wsEvents.c_join](clients[0].id, { name: clients[0].name });
+
+    expect(mockedWsem.sendMessage.mock.calls.length).toBe(0);
+
+    moduleTester.eventHandlers[wsEvents.c_join](clients[1].id, { name: clients[1].name });
+
+    expect(mockedWsem.sendMessage.mock.calls.length).toBe(2);
+    mockedWsem.sendMessage.mock.calls.sort(([id1], [id2]) => id1 - id2);
+
+    const firstCall = mockedWsem.sendMessage.mock.calls[0];
+    expect(firstCall[0]).toBe(0);
+    expect(firstCall[1]).toBe(wsEvents.s_lobbyUpdate);
+    expect(firstCall[2].players).toEqual([{ id: clients[1].id, name: clients[1].name }]);
+
+    const secondCall = mockedWsem.sendMessage.mock.calls[1];
+    expect(secondCall[0]).toBe(1);
+    expect(secondCall[1]).toBe(wsEvents.s_lobbyUpdate);
+    expect(secondCall[2].players).toEqual([{ id: clients[0].id, name: clients[0].name }]);
+  });
 });

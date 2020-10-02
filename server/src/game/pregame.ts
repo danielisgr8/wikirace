@@ -30,8 +30,12 @@ class PregameModule extends NetworkingGameModule {
   }
 
   private joinHandler(id: number, data: { name: string }): void {
+    if(Object.values(this.clients).length > 0) {
+      this.wsem.sendMessage(id, wsEvents.s_lobbyUpdate, { players: Object.values(this.clients).map((client) => ({ id: client.id, name: client.name })) });
+    }
     this.clients[id] = new Client(id, data.name);
     this.wsem.trackClientReconnect(id);
+    this.broadcastMessage(wsEvents.s_lobbyUpdate, { players: [{ id, name: data.name }] }, id);
   }
 
   private startMatchHandler(): void {

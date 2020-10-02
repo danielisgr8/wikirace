@@ -3,6 +3,7 @@ const wsEvents = {
   c_join:         "c_join",
   s_init:         "s_init",
   c_reconnect:    "c_reconnect",
+  s_lobbyUpdate:  "s_lobbyUpdate",
   c_startMatch:   "c_startMatch",
   s_players:      "s_players",
   s_roundInfo:    "s_roundInfo",
