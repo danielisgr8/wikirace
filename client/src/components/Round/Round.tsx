@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 
 import WebSocketEventManager from "../../networking/websocketEventManager";
 import { wsEvents } from "wikirace-shared";
@@ -8,6 +8,7 @@ import { WikiData } from "./types";
 import Preround from "./Preround";
 import Intraround from "./Intraround";
 import Postround from "./Postround";
+import useStorageState from "../../util/useStorageState";
 
 type RoundProps = {
   wsem: WebSocketEventManager,
@@ -15,11 +16,11 @@ type RoundProps = {
 }
 
 const Round = ({ wsem, players }: RoundProps) => {
-  const [source, setSource] = useState<WikiData>({ path: "", title: "", error: false });
-  const [dest, setDest] = useState<WikiData>({ path: "", title: "", error: false });
-  const [roundStarted, setRoundStarted] = useState(false);
-  const [roundEnded, setRoundEnded] = useState(false);
-  const [showPostround, setShowPostround] = useState(false);
+  const [source, setSource] = useStorageState<WikiData>("source", { path: "", title: "", error: false });
+  const [dest, setDest] = useStorageState<WikiData>("dest", { path: "", title: "", error: false });
+  const [roundStarted, setRoundStarted] = useStorageState("roundStarted", false);
+  const [roundEnded, setRoundEnded] = useStorageState("roundEnded", false);
+  const [showPostround, setShowPostround] = useStorageState("showPostround", false);
 
   useEffect(() => {
     wsem.addEventHandler(wsEvents.s_roundInfo, (data) => {

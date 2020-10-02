@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   BrowserRouter as Router,
   Route
@@ -9,43 +9,48 @@ import { wsEvents } from "wikirace-shared";
 
 import Home from "./Home";
 import WebSocketEventManager from "../networking/websocketEventManager";
-
-import "antd/dist/antd.css";
-import "./App.scss";
 import Waiting from "./Waiting";
 import Player from "../models/player";
 import Round from "./Round";
+import useStorageState from "../util/useStorageState";
+import { isSessionPath } from "../networking/util";
+
+import "antd/dist/antd.css";
+import "./App.scss";
 
 const { Header, Content } = Layout;
-
-const isSessionPath = () => ["/", "/end"].every(path => window.location.pathname !== path);
 const { confirm } = Modal;
 
 function App({ wsem }: { wsem: WebSocketEventManager }) {
   // TODO: show some toast on wsem disconnect
 
-  const [name, setName] = useState("");
-  const [players, setPlayers] = useState<Array<Player>>([]);
+  const [name, setName] = useStorageState("name", "", isSessionPath());
+  const [players, setPlayers] = useStorageState<Array<Player>>("players", [], isSessionPath());
 
   useEffect(() => {
+    const handleInit = () => {
+      localStorage.clear();
+      wsem.addEventHandler(wsEvents.s_init, (data) => {
+        localStorage.setItem("clientId", data.clientId);
+        localStorage.setItem("sessionId", data.sessionId);
+      });
+    }
+
     if(isSessionPath() &&
        localStorage.getItem("clientId") !== null &&
        localStorage.getItem("sessionId") !== null) {
       wsem.addEventHandler(wsEvents.s_error, (data) => {
-        // TODO: check if code is 0
-        // TODO: go back home
-        // TODO: clear local storage and add s_init event handler (turn else statement below into function)
+        if(data.code === 0) {
+          handleInit();
+          window.history.pushState(null, "", "/");
+        }
       });
       wsem.sendMessage(wsEvents.c_reconnect, {
         clientId: Number(localStorage.getItem("clientId")),
         sessionId: localStorage.getItem("sessionId")
       });
     } else {
-      localStorage.clear();
-      wsem.addEventHandler(wsEvents.s_init, (data) => {
-        localStorage.setItem("clientId", data.clientId);
-        localStorage.setItem("sessionId", data.sessionId);
-      });
+      handleInit();
     }
   }, [wsem]);
 

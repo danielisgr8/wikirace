@@ -3,4 +3,6 @@ const getWikiTitle = async (page: string): Promise<string> => {
   return (await response.json()).parse.title;
 };
 
-export { getWikiTitle };
+const isSessionPath = () => ["/", "/end"].every(path => window.location.pathname !== path);
+
+export { getWikiTitle, isSessionPath };
