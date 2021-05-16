@@ -7,7 +7,7 @@ import WebSocketEventManager from "./networking/websocketEventManager";
 
 import "./index.css";
 
-const wsem = new WebSocketEventManager(`ws://${window.location.hostname}:81`);
+const wsem = new WebSocketEventManager(`ws://${window.location.hostname}:3002`);
 
 ReactDOM.render(
   <React.StrictMode>
